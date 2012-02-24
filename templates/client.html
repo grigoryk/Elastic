@@ -1,0 +1,22 @@
+<script src="{{ MEDIA_URL }}js/jquery-1.7.1.min.js"></script>
+
+<script>  
+  var api = {
+    'announce': '{% url node-announce %}',
+  },
+  client_id = Math.round(Math.random() * 1000000000);
+	
+	$.ajax({
+	  'url': api.announce,
+	  'data': {'client_id': client_id},
+	  success: function(data) {
+	    alert(data);
+	  },
+	  error: function() {
+	    
+	  }
+	});
+
+</script>
+
+<div id="status"></div>

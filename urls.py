@@ -1,17 +1,13 @@
 from django.conf.urls.defaults import patterns, include, url
 
-# Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from django.contrib import admin
+admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'elastic.views.home', name='home'),
-    # url(r'^elastic/', include('elastic.foo.urls')),
-
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+    # public
+    url(r'^elastic/node/$', 'conductor.views.node_landing', name='node-landing'),
+    
+    # api
+    url(r'^elastic/node/announce/$', 'conductor.views.node_announce', name='node-announce'),
+    url(r'^admin/', include(admin.site.urls)),
 )
