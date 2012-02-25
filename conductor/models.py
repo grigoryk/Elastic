@@ -6,7 +6,7 @@ import pickle
 class Task(models.Model):
     map_code = models.TextField()
     reduce_code = models.TextField()
-    results = models.TextField()
+    results = models.TextField(blank=True, null=True)
     complete = models.BooleanField(default=False)
     
     def got_results(self):
