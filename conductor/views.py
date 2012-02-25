@@ -39,10 +39,7 @@ def node_announce(request):
 
 def node_getwork(request):
     web_tasks = WebTask.objects.filter(complete=False)
-    
-    if len(web_tasks) == 0:
-        return HttpResponse(0)
-    
+        
     for task in web_tasks:
         all_urls = pickle.loads(web_tasks.urls)
         try:
@@ -51,6 +48,8 @@ def node_getwork(request):
             
         except:
             continue
+    
+    return HttpResponse(0)
     
 def node_emit(request):
     pass
