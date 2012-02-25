@@ -7,10 +7,12 @@
 <script src="{{ MEDIA_URL }}js/jquery-1.7.1.min.js"></script>
 
 <script>
-  var api = {
-    'announce': '{% url node-announce %}',
-  },
-  client_id = Math.round(Math.random() * 1000000000);
+  var node = {
+    'server_api': {
+      'announce': '{% url node-announce %}'
+    },
+    'client_id': Math.round(Math.random() * 1000000000)
+  };
   
   function logger(message, error) {
 	  if (error) {
@@ -22,8 +24,8 @@
   	
 	function announce() {
 	  $.ajax({
-  	  'url': api.announce,
-  	  'data': {'client_id': client_id},
+  	  'url': node.server_api.announce,
+  	  'data': {'client_id': node.client_id},
   	  success: function(data) {
   	    logger("Announced to the server. Active nodes: " + data);
   	  },
@@ -34,7 +36,7 @@
 	}
 	
 	$(function() {
-	  logger("Initializing node. Client ID: " + client_id);
+	  logger("Initializing node. Client ID: " + node.client_id);
   	announce();
 
   	setInterval("announce()", 10000);
