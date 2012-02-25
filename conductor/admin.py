@@ -2,10 +2,10 @@ from django.contrib import admin
 
 from models import *
 
-class TaskAdmin(admin.ModelAdmin):
+class WebTaskAdmin(admin.ModelAdmin):
     list_display = ('id', 'got_results')
 
-admin.site.register(Task, TaskAdmin)
+admin.site.register(WebTask, WebTaskAdmin)
 
 class KVAdmin(admin.ModelAdmin):
     list_display = ('id', 'key', 'value', 'unpickled', 'expiration', 'expired')
