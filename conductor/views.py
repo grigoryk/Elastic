@@ -12,7 +12,7 @@ def get_cache(key):
     return cache.get(key)
 
 def set_cache(key, value):
-    cache.set(key, value)
+    cache.set(key, value, 30)
 
 def add_to_cached_set(key, value):
     xs = get_cache(key)
