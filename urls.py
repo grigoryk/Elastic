@@ -9,5 +9,9 @@ urlpatterns = patterns('',
     
     # api
     url(r'^elastic/node/announce/$', 'conductor.views.node_announce', name='node-announce'),
+    url(r'^elastic/node/getwork/$', 'conductor.views.node_getwork', name='node-getwork'),
+    url(r'^elastic/node/emit/$', 'conductor.views.node_emit', name='node-emit'),
+    
+    # other
     url(r'^admin/', include(admin.site.urls)),
 )

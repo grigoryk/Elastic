@@ -36,4 +36,9 @@ def node_announce(request):
     active_nodes = add_to_cached_set('active-nodes', client_id)
 
     return HttpResponse(json.dumps(active_nodes))
-    
+
+def node_getwork(request):
+    pass
+
+def node_emit(request):
+    pass

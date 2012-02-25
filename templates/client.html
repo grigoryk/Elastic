@@ -8,10 +8,12 @@
 
 <script>
   var node = {
-    'server_api': {
-      'announce': '{% url node-announce %}'
+    server_api: {
+      announce: '{% url node-announce %}',
+      get_work: '{% url node-getwork %}',
+      emit: '{% url node-emit %}'
     },
-    'client_id': Math.round(Math.random() * 1000000000)
+    client_id: Math.round(Math.random() * 1000000000)
   };
   
   function logger(message, error) {
@@ -24,8 +26,8 @@
   	
 	function announce() {
 	  $.ajax({
-  	  'url': node.server_api.announce,
-  	  'data': {'client_id': node.client_id},
+  	  url: node.server_api.announce,
+  	  data: {client_id: node.client_id},
   	  success: function(data) {
   	    logger("Announced to the server. Active nodes: " + data);
   	  },
@@ -35,11 +37,49 @@
   	});
 	}
 	
+	function do_work(url) {
+	  $.ajax({
+	    url: url,
+	    data: {client_id: node.client_id},
+	    success: function(code) {
+        // just for now, bad bad bad
+	      eval(code);
+	    }
+	  })
+	}
+	
+	function get_work() {
+	  $.ajax({
+  	  url: node.server_api.get_work,
+  	  success: function(data) {
+  	    data.map && do_work(data.map);
+	      data.reduce && do_work(data.reduce);
+  	  },
+  	  error: function() {
+  	    logger('Error obtaining work.');
+  	  }
+  	});
+	}
+	
+	function emit(o) {
+	  $.ajax({
+	    url: node.server_api.emit,
+	    data: {phase: o.phase, results: o.results},
+	    success: function(data) {
+	      
+	    },
+	    error: function(data) {
+	      
+	    }
+	  })
+	}
+	
 	$(function() {
 	  logger("Initializing node. Client ID: " + node.client_id);
   	announce();
 
   	setInterval("announce()", 10000);
+  	
 	});
 	
 </script>
