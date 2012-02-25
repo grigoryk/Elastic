@@ -17,12 +17,13 @@ def set_cache(key, value):
 def add_to_cached_set(key, value):
     xs = get_cache(key)
     
-    if type(xs) is list:
-        xs.append(value)
-    else:
-        xs = [value]
+    if not xs:
+        xs = []
     
-    set_cache(key, xs)    
+    if value not in xs: 
+        xs.append(value)
+    
+    set_cache(key, xs)
     return xs
 
 def node_landing(request):
