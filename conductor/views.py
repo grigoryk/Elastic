@@ -38,7 +38,19 @@ def node_announce(request):
     return HttpResponse(json.dumps(active_nodes))
 
 def node_getwork(request):
-    pass
-
+    web_tasks = WebTask.objects.filter(complete=False)
+    
+    if len(web_tasks) == 0:
+        return HttpResponse(0)
+    
+    for task in web_tasks:
+        all_urls = pickle.loads(web_tasks.urls)
+        try:
+            url = all_urls.pop()
+            return HttpResponse(json.dumps({"url": url, "task_id": task.id}))
+            
+        except:
+            continue
+    
 def node_emit(request):
     pass

@@ -7,11 +7,18 @@ class Task(models.Model):
     map_code = models.TextField()
     reduce_code = models.TextField()
     results = models.TextField()
+    complete = models.BooleanField(default=False)
     
     def got_results(self):
         if self.results:
             return True
         return False
+    
+    class Meta:
+        abstract = True
+
+class WebTask(Task):
+    urls = models.TextField()
 
 class KV(models.Model):
     key = models.TextField()
