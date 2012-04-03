@@ -10,8 +10,6 @@ try:
 except ImportError:
     import pickle
 
-import base64
-
 class Task(models.Model):
     map_code = models.TextField(blank=True, null=True)
     reduce_code = models.TextField(blank=True, null=True)
@@ -63,15 +61,6 @@ class KV(models.Model):
                 cur += self.raw_split
                 
         super(KV, self).save(*args, **kwargs)
-    
-    def unpickled(self):
-        if self.raw:
-            return None
-        
-        try:
-            return pickle.loads(str(self.value))
-        except:
-            return None
     
     def expired(self):
         if not self.expiration:

@@ -8,13 +8,11 @@ from utilities import *
 import pickle
 import json
 import math
-import base64
 import random
 
 def node_landing(request):
     return render_to_response('client.html', {
     }, context_instance=RequestContext(request))
-
 
 def mark_node_active(client_id):
     set_cache('active-node-%s' % client_id, True, 3)
