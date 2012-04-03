@@ -11,7 +11,7 @@ import json
 def get_cache(key):
     return cache.get(key)
 
-def set_cache(key, value):
+def set_cache(key, value, expiration=30):
     cache.set(key, value, 30)
 
 def add_to_cached_set(key, value):
@@ -23,6 +23,9 @@ def add_to_cached_set(key, value):
     if value not in xs: 
         xs.append(value)
     
+    # remove expired nodes
+    xs = [x for x in xs if get_cache(x)]
+    
     set_cache(key, xs)
     return xs
 
@@ -33,7 +36,8 @@ def node_landing(request):
 def node_announce(request):
     client_id = request.GET.get('client_id')
     
-    active_nodes = add_to_cached_set('active-nodes', client_id)
+    set_cache('active-node-%s' % client_id, True, 25)
+    active_nodes = add_to_cached_set('active-nodes', 'active-node-%s' % client_id)
 
     return HttpResponse(json.dumps(active_nodes))
 
