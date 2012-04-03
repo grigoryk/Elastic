@@ -11,22 +11,6 @@ import math
 import base64
 import random
 
-def add_to_cached_set(key, value, expiration=30, is_node=False):
-    xs = get_cache(key)
-    
-    if not xs:
-        xs = []
-    
-    if value not in xs: 
-        xs.append(value)
-    
-    if is_node:
-        # remove expired nodes
-        xs = [x for x in xs if get_cache(x)]
-    
-    set_cache(key, xs, expiration)
-    return xs
-
 def node_landing(request):
     return render_to_response('client.html', {
     }, context_instance=RequestContext(request))
