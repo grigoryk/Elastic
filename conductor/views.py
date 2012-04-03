@@ -176,6 +176,14 @@ def data_get(request):
     split_to = request.GET.get('to')
     
     chunk = get_cache('%s-%s-%s' % (key, split_from, split_to))
+    if not chunk:
+        try:
+            kv = KV.objects.get(id=key)
+            # force kv to be split into chunks and cached
+            kv.save()
+            chunk = get_cache('%s-%s-%s' % (key, split_from, split_to))
+        except:
+            chunk = None
     
     return HttpResponse(chunk)
 
