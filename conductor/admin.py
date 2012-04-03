@@ -8,6 +8,6 @@ class WebTaskAdmin(admin.ModelAdmin):
 admin.site.register(WebTask, WebTaskAdmin)
 
 class KVAdmin(admin.ModelAdmin):
-    list_display = ('id', 'key', 'value', 'unpickled', 'expiration', 'expired')
+    list_display = ('id', 'key', 'expiration', 'expired')
 
 admin.site.register(KV, KVAdmin)

@@ -1,87 +1,130 @@
-<style>
-  .error {
-    color: red;
-  }
-</style>
+<html>
+<head>
+  <title>Elastic Node</title>
+  <style>
+    body {
+      color: #FFF5F1;
+      margin-left: 100px;
+      margin-top: 100px;
+    }
+    .title {
+      color: #E54D2E;
+      font-size: 45pt;
+    }
+    .subtitle {
+      color: #7893AD;
+      font-size: 35pt;
+    }
+    .error {
+      color: red;
+    }
+    #counters {
+      color: #2D2A52;
+      margin-top: 100px;
+      font-size: 25pt;
+    }
+  </style>
+</head>
 
-<script src="{{ MEDIA_URL }}js/jquery-1.7.1.min.js"></script>
-
-<script>
-  var node = {
-    server_api: {
-      announce: '{% url node-announce %}',
-      get_work: '{% url node-getwork %}',
-      emit: '{% url node-emit %}'
-    },
-    client_id: Math.round(Math.random() * 1000000000)
-  };
+<body>
+  <div class="title">Elastic Node ...</div>
+  <div class="subtitle"></div>
+  <div id="status"></div>
+  <div id="counters"></div>
+  <ul id="logger"></ul>
   
-  function logger(message, error) {
-	  if (error) {
-	    $("#logger").append("<li class='error'>" + Date.now() + ": " + message + "</li>");
-	  } else {
-	    $("#logger").append("<li>" + Date.now() + ": " + message + "</li>");
-	  }
-	}
-  	
-	function announce() {
-	  $.ajax({
-  	  url: node.server_api.announce,
-  	  data: {client_id: node.client_id},
-  	  success: function(data) {
-  	    logger("Announced to the server. Active nodes: " + data);
-  	  },
-  	  error: function() {
-  	    logger("Could not announce to the server.", "error");
+  <script src="{{ MEDIA_URL }}js/jquery-1.7.1.min.js"></script>
+  <script>
+    var node = {
+      server_api: {
+        announce: '{% url node-announce %}',
+        get_work: '{% url node-getwork %}',
+        emit: '{% url node-emit %}'
+      },
+      client_id: Math.round(Math.random() * 1000000000)
+    }, reduce_counter = 0, map_counter = 0, emit_counter = 0, get_work_interval = 0;
+  
+    function logger(message, error) {
+  	  if (error) {
+  	    $("#logger").append("<li class='error'>" + Date.now() + ": " + message + "</li>");
+  	  } else {
+  	    $("#logger").append("<li>" + Date.now() + ": " + message + "</li>");
   	  }
-  	});
-	}
+  	}
 	
-	function do_work(url) {
-	  $.ajax({
-	    url: url,
-	    data: {client_id: node.client_id},
-	    success: function(code) {
-        // just for now, bad bad bad
-	      eval(code);
-	    }
-	  })
-	}
-	
-	function get_work() {
-	  $.ajax({
-  	  url: node.server_api.get_work,
-  	  success: function(data) {
-  	    data.map && do_work(data.map);
-	      data.reduce && do_work(data.reduce);
-  	  },
-  	  error: function() {
-  	    logger('Error obtaining work.');
-  	  }
-  	});
-	}
-	
-	function emit(o) {
-	  $.ajax({
-	    url: node.server_api.emit,
-	    data: {phase: o.phase, results: o.results},
-	    success: function(data) {
-	      
-	    },
-	    error: function(data) {
-	      
-	    }
-	  })
-	}
-	
-	$(function() {
-	  logger("Initializing node. Client ID: " + node.client_id);
-  	announce();
-
-  	setInterval("announce()", 10000);
+  	function set_status(message) {
+  	  $(".subtitle").html(message);
+  	}
   	
-	});
+  	function update_counters() {
+  	  $("#counters").html("Emitted: " + emit_counter + ", Mapped: " + map_counter + ", Reduced: " + reduce_counter);
+  	}
+  	
+  	function announce() {
+  	  $.ajax({
+    	  url: node.server_api.announce,
+    	  dataType: 'json',
+    	  data: {client_id: node.client_id},
+    	  success: function(data) {
+    	    $(".title").html("Elastic Node #" + node.client_id);
+    	    $(".subtitle").html("Total nodes: " + data['nodes'].length);
+    	  },
+    	  error: function() {
+    	    set_status("Error Connecting. Client ID: " + node.client_id);
+    	  }
+    	});
+  	}
 	
-</script>
+  	function get_work() {
+  	  $.ajax({
+    	  url: node.server_api.get_work,
+    	  data: {client_id: node.client_id},
+    	  dataType: 'json',
+    	  success: function(data) {
+    	    if (data.map || data.reduce) {
+            // clearInterval(get_work_interval);
+    	    }
+          // execute work
+    	    if (data.map) {
+    	      $.getScript("/elastic/elastic/task/" + data.task_id + "/map.js?url=" + escape(data.url));
+    	    } else if (data.reduce) {
+    	      $.getScript("/elastic/elastic/task/" + data.task_id + "/reduce.js?key=" + escape(data.key) + "&item_list=" + data.item_list);
+    	    }
+    	  },
+    	  error: function() {
+    	  }
+    	});
+  	}
+	
+  	function emit(o) {
+  	  $.ajax({
+  	    url: node.server_api.emit,
+  	    data: o,
+  	    success: function(data) {
+  	      if (o.url) {
+  	        map_counter += 1;
+            // get_work_interval = setInterval("get_work()", 1000);
+  	      } else if (o.phase == "reduce") {
+  	        reduce_counter += 1;
+            // get_work_interval = setInterval("get_work()", 1000);
+  	      }
+  	      emit_counter += 1;
+  	      
+  	      update_counters();
+  	    },
+  	    error: function(data) {
+  	    }
+  	  });
+  	}
+	
+  	$(function() {
+    	announce();
 
-<ul id="logger"></ul>
+    	setInterval("announce()", 1000);
+    	get_work_interval = setInterval("get_work()", 1000);
+  	
+  	});
+	
+  </script>
+</body>
+</html>
